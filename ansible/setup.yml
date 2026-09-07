@@ -1,0 +1,27 @@
+- name: Configure DeployForge server
+  hosts: servers
+  become: true
+
+  tasks:
+    - name: Create application user
+      user:
+        name: deployforge
+        shell: /bin/bash
+        create_home: true
+
+    - name: Create application directory
+      file:
+        path: /opt/deployforge
+        state: directory
+        owner: deployforge
+        group: deployforge
+        mode: '0755'
+
+    - name: Deploy application script
+      copy:
+        src: app.sh
+        dest: /opt/deployforge/app.sh
+        owner: deployforge
+        group: deployforge
+        mode: '0755'
+

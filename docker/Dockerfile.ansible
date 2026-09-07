@@ -1,0 +1,15 @@
+FROM ubuntu:24.04
+
+RUN apt-get update && \
+    apt-get install -y openssh-server sudo python3 && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN useradd -m -s /bin/bash deployer && \
+    echo "deployer:deployforge" | chpasswd && \
+    usermod -aG sudo deployer
+
+RUN mkdir -p /run/sshd
+
+EXPOSE 22
+
+CMD ["/usr/sbin/sshd", "-D"]

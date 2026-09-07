@@ -1,6 +1,3 @@
 #!/bin/bash
-
-while true; do
-    echo "DeployForge application is running..."
-    sleep 10
-done
+cd /web
+python3 -m http.server 8080 --bind 0.0.0.0
