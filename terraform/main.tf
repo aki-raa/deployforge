@@ -9,32 +9,32 @@ terraform {
 provider "docker" {}
 
 resource "docker_network" "deployforge" {
-  name = "deployforge-net"
+  name = var.network_name
 }
 
 resource "docker_container" "app" {
-  name         = "deployforge-app"
-  image        = "deployforge-app"
+  name         = var.app_container_name
+  image        = var.app_image
   network_mode = docker_network.deployforge.name
 
   ports {
-    internal = 8080
-    external = 8090
+    internal = var.app_internal_port
+    external = var.app_external_port
   }
 }
 
 resource "docker_container" "ansible_target" {
-  name         = "deployforge-ansible-target"
-  image        = "deployforge-ansible-target"
+  name         = var.target_container_name
+  image        = var.target_image
   network_mode = docker_network.deployforge.name
 
   ports {
     internal = 22
-    external = 2222
+    external = var.ssh_external_port
   }
+
   ports {
     internal = 80
-    external = 8081
+    external = var.nginx_external_port
   }
 }
-

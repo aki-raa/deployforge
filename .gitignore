@@ -3,3 +3,11 @@
 *.tfstate.*
 crash.log
 crash.*.log
+
+# Secrets and private keys
+*.pem
+*.key
+.env
+.env.*
+id_rsa
+id_rsa.*

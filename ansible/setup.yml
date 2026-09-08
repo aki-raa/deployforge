@@ -72,6 +72,11 @@
       command: nginx
       when: nginx_process.rc != 0
 
+    - name: Check application health
+      uri:
+        url: http://localhost
+        status_code: 200
+
   handlers:
     - name: Reload Nginx
       command: nginx -s reload
