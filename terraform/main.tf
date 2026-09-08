@@ -32,5 +32,9 @@ resource "docker_container" "ansible_target" {
     internal = 22
     external = 2222
   }
+  ports {
+    internal = 80
+    external = 8081
+  }
 }
 

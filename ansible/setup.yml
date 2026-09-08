@@ -15,7 +15,7 @@
         state: directory
         owner: deployforge
         group: deployforge
-        mode: '0755'
+        mode: "0755"
 
     - name: Deploy application script
       copy:
@@ -23,5 +23,49 @@
         dest: /opt/deployforge/app.sh
         owner: deployforge
         group: deployforge
-        mode: '0755'
+        mode: "0755"
 
+    - name: Install Nginx
+      apt:
+        name: nginx
+        state: present
+        update_cache: true
+
+    - name: Disable default Nginx site
+      file:
+        path: /etc/nginx/sites-enabled/default
+        state: absent
+
+    - name: Deploy Nginx configuration
+      template:
+        src: templates/deployforge.conf.j2
+        dest: /etc/nginx/sites-available/deployforge.conf
+        owner: root
+        group: root
+        mode: "0644"
+      notify: Reload Nginx
+
+    - name: Enable DeployForge Nginx site
+      file:
+        src: /etc/nginx/sites-available/deployforge.conf
+        dest: /etc/nginx/sites-enabled/deployforge.conf
+        state: link
+      notify: Reload Nginx
+
+    - name: Test Nginx configuration
+      command: nginx -t
+      changed_when: false
+
+    - name: Check if Nginx is running
+      command: pgrep -x nginx
+      register: nginx_process
+      failed_when: false
+      changed_when: false
+
+    - name: Start Nginx
+      command: nginx
+      when: nginx_process.rc != 0
+
+  handlers:
+    - name: Reload Nginx
+      command: nginx -s reload
