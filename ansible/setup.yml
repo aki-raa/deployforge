@@ -2,27 +2,32 @@
   hosts: servers
   become: true
 
+  vars:
+    app_user: deployforge
+    app_directory: /opt/deployforge
+    nginx_config: deployforge.conf
+
   tasks:
     - name: Create application user
       user:
-        name: deployforge
+        name: "{{ app_user }}"
         shell: /bin/bash
         create_home: true
 
     - name: Create application directory
       file:
-        path: /opt/deployforge
+        path: "{{ app_directory }}"
         state: directory
-        owner: deployforge
-        group: deployforge
+        owner: "{{ app_user }}"
+        group: "{{ app_user }}"
         mode: "0755"
 
     - name: Deploy application script
       copy:
         src: app.sh
-        dest: /opt/deployforge/app.sh
-        owner: deployforge
-        group: deployforge
+        dest: "{{ app_directory }}/app.sh"
+        owner: "{{ app_user }}"
+        group: "{{ app_user }}"
         mode: "0755"
 
     - name: Install Nginx
@@ -35,11 +40,12 @@
       file:
         path: /etc/nginx/sites-enabled/default
         state: absent
+      notify: Reload Nginx
 
     - name: Deploy Nginx configuration
       template:
         src: templates/deployforge.conf.j2
-        dest: /etc/nginx/sites-available/deployforge.conf
+        dest: "/etc/nginx/sites-available/{{ nginx_config }}"
         owner: root
         group: root
         mode: "0644"
@@ -47,8 +53,8 @@
 
     - name: Enable DeployForge Nginx site
       file:
-        src: /etc/nginx/sites-available/deployforge.conf
-        dest: /etc/nginx/sites-enabled/deployforge.conf
+        src: "/etc/nginx/sites-available/{{ nginx_config }}"
+        dest: "/etc/nginx/sites-enabled/{{ nginx_config }}"
         state: link
       notify: Reload Nginx
 
