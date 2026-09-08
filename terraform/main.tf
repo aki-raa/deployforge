@@ -16,7 +16,7 @@ resource "docker_container" "app" {
   name         = var.app_container_name
   image        = var.app_image
   network_mode = docker_network.deployforge.name
-
+  restart      = "unless-stopped"
   ports {
     internal = var.app_internal_port
     external = var.app_external_port
