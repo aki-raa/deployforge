@@ -45,9 +45,6 @@ jobs:
       - name: Build application image
         run: docker build -t deployforge-app:ci ./app
 
-      - name: Occupy port 8090 (simulate conflict)
-        run: docker run -d --name deployforge-port-squatter -p 8090:80 nginx:alpine
-
       - name: Start application container
         run: docker run -d --name deployforge-ci -p 8090:8080 deployforge-app:ci
 
@@ -58,6 +55,4 @@ jobs:
 
       - name: Cleanup application container
         if: always()
-        run: |
-          docker rm -f deployforge-ci || true
-          docker rm -f deployforge-port-squatter || true
+        run: docker rm -f deployforge-ci
