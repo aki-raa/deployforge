@@ -41,3 +41,18 @@ jobs:
 
       - name: Ansible Syntax Check
         run: ansible-playbook -i ansible/inventory.ini ansible/setup.yml --syntax-check
+
+      - name: Build application image
+        run: docker build -t deployforge-app:ci ./app
+
+      - name: Start application container
+        run: docker run -d --name deployforge-ci -p 8090:8080 deployforge-app:ci
+
+      - name: Application health check
+        run: |
+          sleep 2
+          curl --fail http://localhost:8090
+
+      - name: Cleanup application container
+        if: always()
+        run: docker rm -f deployforge-ci
